@@ -1,46 +1,39 @@
-name: Bootstrap Flutter project
+name: Build Android App Bundle
 
 on:
-  workflow_dispatch:
   push:
-    branches: [ main ]
-
-permissions:
-  contents: write
+    branches: [ "main" ]
+  workflow_dispatch:
 
 jobs:
-  bootstrap:
+  build:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "17"
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: stable
+          channel: "stable"
 
-      - name: Create Flutter app if missing
-        run: |
-          if [ -f "uk_weather/pubspec.yaml" ]; then
-            echo "uk_weather already exists. Skipping."
-            exit 0
-          fi
+      - name: Get dependencies
+        working-directory: uk_weather
+        run: flutter pub get
 
-          flutter create uk_weather \
-            --org com.britishunityuk \
-            --project-name uk_weather \
-            --platforms android
+      - name: Build AAB
+        working-directory: uk_weather
+        run: flutter build appbundle --release
 
-      - name: Commit & push generated project
-        run: |
-          if [ -z "$(git status --porcelain)" ]; then
-            echo "Nothing to commit."
-            exit 0
-          fi
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add -A
-          git commit -m "Bootstrap Flutter project in uk_weather"
-          git push
-          
+      - name: Upload AAB
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-app-bundle
+          path: uk_weather/build/app/outputs/bundle/release/*.aab
