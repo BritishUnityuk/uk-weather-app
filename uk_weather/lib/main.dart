@@ -43,8 +43,7 @@ class _WeatherHomeState extends State<WeatherHome> {
       loading = true;
     });
 
-    final url = Uri.parse(
-        "https://api.openweathermap.org/data/2.5/weather?q=$city,uk&appid=$apiKey&units=metric");
+    final url = Uri.parse("https://api.openweathermap.org/data/2.5/weather?q=$city,uk&appid=$apiKey&units=metric");
 
     final response = await http.get(url);
 
