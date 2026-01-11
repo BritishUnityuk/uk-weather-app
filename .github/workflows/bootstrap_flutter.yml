@@ -41,3 +41,4 @@ jobs:
           git add -A
           git commit -m "Bootstrap Flutter project in uk_weather"
           git push
+          
