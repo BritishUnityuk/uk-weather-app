@@ -36,7 +36,7 @@ class _WeatherHomeState extends State<WeatherHome> {
   String icon = "";
   bool loading = false;
 
-  final apiKey = "0557657c1b5a79d7b5b190455335645c";
+  const String apiKey = String.fromEnvironment('OPENWEATHER_API_KEY');
 
   Future<void> fetchWeather() async {
     setState(() {
