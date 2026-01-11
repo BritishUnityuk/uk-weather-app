@@ -1,0 +1,43 @@
+name: Bootstrap Flutter project
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  bootstrap:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Create Flutter app if missing
+        run: |
+          if [ -f "uk_weather/pubspec.yaml" ]; then
+            echo "uk_weather already exists. Skipping."
+            exit 0
+          fi
+
+          flutter create uk_weather \
+            --org com.britishunityuk \
+            --project-name uk_weather \
+            --platforms android
+
+      - name: Commit & push generated project
+        run: |
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "Nothing to commit."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Bootstrap Flutter project in uk_weather"
+          git push
